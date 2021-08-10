@@ -43,15 +43,3 @@ Open a terminal to execute the following command:
 ```bash
 curl -X POST -H "Content-Type:application/json" -d @examples/basic-example.json http://localhost:8083/connectors
 ```
-
-### 4 - Check the data in Kafka
-
-Open a terminal to execute the following command:
-
-```bash
-docker exec kafka kafka-console-consumer --bootstrap-server kafka:9092 --topic source-1 --from-beginning
-```
-
-# License
-
-This project is licensed under the [Apache 2.0 License](./LICENSE).
