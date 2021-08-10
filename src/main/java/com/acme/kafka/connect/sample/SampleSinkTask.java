@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.kafka.connect.errors.ConnectException;
 import org.apache.kafka.connect.errors.RetriableException;
 import org.apache.kafka.connect.sink.SinkRecord;
 import org.apache.kafka.connect.sink.SinkTask;
@@ -63,7 +64,7 @@ public class SampleSinkTask extends SinkTask {
         if (generateError){
             log.info("Error on sending to external system the message ["+record.value()+"]");
             // throw new RetriableException("Some error on external system side");
-            throw new RuntimeException("Error on external system side");
+            throw new ConnectException("Error on external system side");
         } else if (isPrint) {
             log.info("Successful send to external system the message ["+record.value()+"]");
         }
