@@ -1,23 +1,17 @@
 package com.acme.kafka.connect.sample;
 
-import java.util.ArrayList;
+import static com.acme.kafka.connect.sample.SampleSinkConnectorConfig.MONITOR_THREAD_TIMEOUT_CONFIG;
+
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.time.*;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.apache.kafka.clients.producer.RecordMetadata;
-import org.apache.kafka.connect.data.Schema;
-import org.apache.kafka.connect.source.SourceRecord;
-import org.apache.kafka.connect.header.ConnectHeaders;
+import org.apache.kafka.connect.errors.RetriableException;
 import org.apache.kafka.connect.sink.SinkRecord;
 import org.apache.kafka.connect.sink.SinkTask;
-
-import static com.acme.kafka.connect.sample.SampleSinkConnectorConfig.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SampleSinkTask extends SinkTask {
     private static Logger log = LoggerFactory.getLogger(SampleSinkTask.class);
@@ -44,8 +38,35 @@ public class SampleSinkTask extends SinkTask {
     }
 
     @Override
-    public void put(Collection<SinkRecord> records) {
-        log.info("Received "+records.size());       
+    public void put(Collection<SinkRecord> records){
+        // log.info("Received "+records.size());
+        Boolean isPrint=false;
+        int max=0;
+        int errorOn=3;
+        if (records.size()!=1){
+            log.info("Received collection with not a single element. Count is "+records.size());
+            isPrint=true;
+
+        } 
+        for (SinkRecord sinkRecord : records) {
+            if (max>=errorOn) {
+                processRecord(sinkRecord, true, true);
+            } else {
+                processRecord(sinkRecord, false, isPrint);
+            }
+            max++;
+        }
+    }
+
+    private void processRecord(SinkRecord record, Boolean generateError, Boolean isPrint){
+        //Emulates communication with external system
+        if (generateError){
+            log.info("Error on sending to external system the message ["+record.value()+"]");
+            // throw new RetriableException("Some error on external system side");
+            throw new RuntimeException("Error on external system side");
+        } else if (isPrint) {
+            log.info("Successful send to external system the message ["+record.value()+"]");
+        }
     }
 
 }
