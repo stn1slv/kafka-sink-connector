@@ -1,14 +1,21 @@
 {
-    "name": "basic-example",
+    "name": "basic-sink",
     "config": {
         "connector.class": "com.acme.kafka.connect.sample.SampleSinkConnector",
         "first.required.param": "Kafka",
         "second.required.param": "Connect",
         "topics": "output",
         "tasks.max": "1",
+        "max.retries": "3",
         "errors.tolerance": "all",
-        "errors.deadletterqueue.topic.name": "dlq_topic",
+        "errors.log.enable": "true",
+        "errors.deadletterqueue.topic.name": "dlq-topic",
         "errors.deadletterqueue.topic.replication.factor": 1,
-        "errors.deadletterqueue.context.headers.enable": true
+        "errors.deadletterqueue.context.headers.enable": true,
+        "errors.retry.delay.max.ms": "1000",
+        "errors.retry.timeout": "0",
+        "errors.log.include.messages": true,
+        "value.converter": "org.apache.kafka.connect.storage.StringConverter",
+        "value.converter.schemas.enable": "true"
     }
 }
