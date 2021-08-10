@@ -1,0 +1,14 @@
+{
+    "name": "basic-example",
+    "config": {
+        "connector.class": "com.acme.kafka.connect.sample.SampleSinkConnector",
+        "first.required.param": "Kafka",
+        "second.required.param": "Connect",
+        "topics": "output",
+        "tasks.max": "1",
+        "errors.tolerance": "all",
+        "errors.deadletterqueue.topic.name": "dlq_topic",
+        "errors.deadletterqueue.topic.replication.factor": 1,
+        "errors.deadletterqueue.context.headers.enable": true
+    }
+}
