@@ -1,6 +1,6 @@
 # Kafka Connect Sample Connector
 
-This repo contains a sample project that can be used to start off your own source connector for Kafka Connect.
+This repo contains a sample project that can be used to start off your own sink connector for Kafka Connect.
 
 ## Building the connector
 
