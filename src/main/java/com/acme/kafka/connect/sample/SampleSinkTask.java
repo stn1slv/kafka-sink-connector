@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.LongAdder;
 import java.time.*;
 
 import org.slf4j.Logger;
@@ -26,7 +27,7 @@ public class SampleSinkTask extends SinkTask {
     private SampleSinkConnectorConfig config;
     private int monitorThreadTimeout;
     private List<String> sources;
-    private Map<Integer, Integer> stat;
+    private Map<Integer, LongAdder> stat;
 
     @Override
     public String version() {
@@ -39,7 +40,7 @@ public class SampleSinkTask extends SinkTask {
         monitorThreadTimeout = config.getInt(MONITOR_THREAD_TIMEOUT_CONFIG);
         String sourcesStr = properties.get("sources");
         sources = Arrays.asList(sourcesStr.split(","));
-        stat = new ConcurrentHashMap<Integer, Integer>();
+        stat = new ConcurrentHashMap<>();
     }
 
     @Override
@@ -48,11 +49,7 @@ public class SampleSinkTask extends SinkTask {
 
     @Override
     public void put(Collection<SinkRecord> records) {
-        Integer val = stat.get(records.size());
-        if (val == null) {
-            val = 0;
-        }
-        stat.put(records.size(), val + 1);
+        stat.computeIfAbsent(records.size(), k -> new LongAdder()).increment();
         log.info("Received " + records.size());
         log.info(stat.toString());
     }
