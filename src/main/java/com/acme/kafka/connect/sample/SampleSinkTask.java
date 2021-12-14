@@ -31,21 +31,6 @@ public class SampleSinkTask extends SinkTask {
     @Override
     public void start(Map<String, String> properties) {
         config = new SampleSinkConnectorConfig(properties);
-        monitorThreadTimeout = config.getInt(MONITOR_THREAD_TIMEOUT_CONFIG);
-        String sourcesStr = properties.get("sources");
-        sources = Arrays.asList(sourcesStr.split(","));
-
-        this.reporter = null;
-        try {
-            if (context.errantRecordReporter() == null) {
-                log.info("Errant record reporter not configured.");
-            }
-            // may be null if DLQ not enabled
-            reporter = context.errantRecordReporter();
-        } catch (NoClassDefFoundError | NoSuchMethodError e) {
-            // Will occur in Connect runtimes earlier than 2.6
-            log.warn("AK versions prior to 2.6 do not support the errant record reporter.");
-        }
     }
 
     @Override
@@ -58,35 +43,8 @@ public class SampleSinkTask extends SinkTask {
             return;
         }
 
-        int max = 0;
-        int errorOn = 3;
-        if (records.size() != 1) {
-            log.info("Received collection with multiple elements. Count is " + records.size());
-        }
         for (SinkRecord sinkRecord : records) {
-            if (max >= errorOn) {
-                // Emulate an error from external system
-                processRecord(sinkRecord, true, true);
-            } else {
-                processRecord(sinkRecord, false, false);
-            }
-            max++;
-        }
-    }
-
-    private void processRecord(SinkRecord record, Boolean generateError, Boolean isPrint) {
-        // Emulates communication with external system
-        if (generateError) {
-            log.info("Error on sending to external system the message [" + record.toString() + "]");
-            reportBadRecord(record, new ConnectException("Some error on external system side"));
-        } else if (isPrint) {
-            log.info("Successful send to external system the message [" + record.toString() + "]");
-        }
-    }
-
-    private void reportBadRecord(SinkRecord record, Throwable error) {
-        if (reporter != null) {
-            reporter.report(record, error);
+            log.info("New message: " + sinkRecord.value().toString());
         }
     }
 
