@@ -9,6 +9,7 @@ import java.util.Map;
 
 import org.apache.kafka.connect.errors.ConnectException;
 import org.apache.kafka.connect.errors.RetriableException;
+import org.apache.kafka.connect.header.Headers;
 import org.apache.kafka.connect.sink.ErrantRecordReporter;
 import org.apache.kafka.connect.sink.SinkRecord;
 import org.apache.kafka.connect.sink.SinkTask;
@@ -57,32 +58,30 @@ public class SampleSinkTask extends SinkTask {
         if (records.isEmpty()) {
             return;
         }
+        log.info("Received records: "+records.size());
 
-        int max = 0;
-        int errorOn = 3;
-        if (records.size() != 1) {
-            log.info("Received collection with multiple elements. Count is " + records.size());
-        }
+        // int max = 0;
+        // int errorOn = 3;
+        // if (records.size() != 1) {
+        //     log.info("Received collection with multiple elements. Count is " + records.size());
+        // }
         for (SinkRecord sinkRecord : records) {
-            if (max >= errorOn) {
-                // Emulate an error from external system
-                processRecord(sinkRecord, true, true);
-            } else {
-                processRecord(sinkRecord, false, false);
+            if (sinkRecord.headers().allWithName("generateError").hasNext()){
+                // throw new ConnectException("Some error");
+                reportBadRecord(sinkRecord, new ConnectException("Some error on external system side"));
             }
-            max++;
         }
     }
 
-    private void processRecord(SinkRecord record, Boolean generateError, Boolean isPrint) {
-        // Emulates communication with external system
-        if (generateError) {
-            log.info("Error on sending to external system the message [" + record.toString() + "]");
-            reportBadRecord(record, new ConnectException("Some error on external system side"));
-        } else if (isPrint) {
-            log.info("Successful send to external system the message [" + record.toString() + "]");
-        }
-    }
+    // private void processRecord(SinkRecord record, Boolean generateError, Boolean isPrint) {
+    //     // Emulates communication with external system
+    //     if (generateError) {
+    //         log.info("Error on sending to external system the message [" + record.toString() + "]");
+    //         reportBadRecord(record, new ConnectException("Some error on external system side"));
+    //     } else if (isPrint) {
+    //         log.info("Successful send to external system the message [" + record.toString() + "]");
+    //     }
+    // }
 
     private void reportBadRecord(SinkRecord record, Throwable error) {
         if (reporter != null) {
