@@ -24,7 +24,7 @@ After building the connector you can try it by using the Docker-based installati
 Remove old containers:
 
 ```bash
-docker rm kafka zookeeper connect
+docker rm kafka zookeeper connect prometheus
 
 ```
 
@@ -42,4 +42,23 @@ Open a terminal to execute the following command:
 
 ```bash
 curl -X POST -H "Content-Type:application/json" -d @examples/basic-example.json http://localhost:8083/connectors
+```
+
+### 3 - Send messagies to kafka
+
+Successful:
+```bash
+echo "Message body `date`" | kcat -P -b 127.0.0.1 -t output -H "Header345=value1" -H "Header7891=value1"
+```
+ConnectException:
+```bash
+echo "Message body `date`" | kcat -P -b 127.0.0.1 -t output -H "Header345=value1" -H "Header7891=value1" -H "generateConnectException=val"
+```
+IllegalStateException:
+```bash
+echo "Message body `date`" | kcat -P -b 127.0.0.1 -t output -H "Header345=value1" -H "Header7891=value1" -H "generateIllegalStateException=val"
+```
+UnsupportedOperationException:
+```bash
+echo "Message body `date`" | kcat -P -b 127.0.0.1 -t output -H "Header345=value1" -H "Header7891=value1" -H "generateUnsupportedOperationException=val"
 ```

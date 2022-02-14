@@ -66,9 +66,17 @@ public class SampleSinkTask extends SinkTask {
         //     log.info("Received collection with multiple elements. Count is " + records.size());
         // }
         for (SinkRecord sinkRecord : records) {
-            if (sinkRecord.headers().allWithName("generateError").hasNext()){
+            if (sinkRecord.headers().allWithName("generateConnectException").hasNext()){
                 // throw new ConnectException("Some error");
-                reportBadRecord(sinkRecord, new ConnectException("Some error on external system side"));
+                reportBadRecord(sinkRecord, new ConnectException("Generated ConnectException"));
+            }
+            if (sinkRecord.headers().allWithName("generateIllegalStateException").hasNext()){
+                // throw new ConnectException("Some error");
+                reportBadRecord(sinkRecord, new IllegalStateException("Generated IllegalStateException"));
+            }
+            if (sinkRecord.headers().allWithName("generateUnsupportedOperationException").hasNext()){
+                // throw new ConnectException("Some error");
+                reportBadRecord(sinkRecord, new UnsupportedOperationException("Generated UnsupportedOperationException"));
             }
         }
     }

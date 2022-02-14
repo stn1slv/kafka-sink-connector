@@ -61,3 +61,11 @@
       volumes:
         - ./target/components/packages/you-kafka-connect-sample-0.2.0/you-kafka-connect-sample-0.2.0/lib:/usr/share/java/kafka-connect-sample
         - ./jmx-exporter:/usr/share/jmx_exporter/
+    prometheus:
+        image: prom/prometheus:v2.27.1
+        container_name: prometheus
+        restart: unless-stopped
+        volumes:
+            - ./prometheusConfig.yml:/etc/prometheus/prometheus.yml
+        ports:
+            - 9090:9090
